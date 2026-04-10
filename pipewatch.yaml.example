@@ -1,0 +1,39 @@
+# pipewatch.yaml.example
+# Copy this file to pipewatch.yaml and customise for your environment.
+# All fields are optional; built-in defaults are shown below.
+
+# How often pipewatch polls each pipeline source (seconds).
+check_interval_seconds: 60
+
+# List of pipelines to monitor.
+pipelines:
+  - name: sales_etl          # Human-readable identifier (required)
+    source: postgres          # Source type: postgres | mysql | s3 | http
+    connection: "postgresql://user:pass@localhost:5432/warehouse"
+    # Optional: SQL or path used to determine pipeline health
+    health_query: "SELECT COUNT(*) FROM etl_runs WHERE status='failed' AND started_at > NOW() - INTERVAL '1 hour'"
+
+  - name: user_events_kafka
+    source: http
+    connection: "http://kafka-exporter.internal/metrics"
+    # Override global alert thresholds for this pipeline only
+    alert:
+      max_latency_seconds: 60
+
+# Global alert configuration.
+alert:
+  # Fraction of recent runs allowed to fail before alerting (0.0 – 1.0).
+  max_failure_rate: 0.1
+
+  # Maximum acceptable seconds since the last successful run.
+  max_latency_seconds: 300
+
+  # Notification back-end: log | slack | webhook
+  notify: log
+
+  # Required when notify: slack
+  # slack_webhook_url: "https://hooks.slack.com/services/XXX/YYY/ZZZ"
+
+  # Required when notify: webhook
+  # webhook_url: "https://alerts.example.com/pipewatch"
+  # webhook_secret: "changeme"
