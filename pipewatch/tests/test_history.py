@@ -85,3 +85,11 @@ def test_pipeline_name_with_spaces_is_safe(hist_dir, sample_metric):
     record_snapshot("my pipeline", sample_metric, history_dir=hist_dir)
     result = load_snapshots("my pipeline", history_dir=hist_dir)
     assert len(result) == 1
+
+
+def test_record_snapshot_does_not_mutate_original_metric(hist_dir, sample_metric):
+    """Ensure record_snapshot does not modify the caller's metric dict."""
+    original_keys = set(sample_metric.keys())
+    record_snapshot("orders_etl", sample_metric, history_dir=hist_dir)
+    assert set(sample_metric.keys()) == original_keys
+    assert "recorded_at" not in sample_metric
