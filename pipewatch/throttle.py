@@ -40,6 +40,8 @@ def record_alert(pipeline: str, cooldown_seconds: Optional[float] = None) -> Non
     If the pipeline has no existing entry a default cooldown is applied unless
     *cooldown_seconds* is provided explicitly.
     """
+    if cooldown_seconds is not None and cooldown_seconds < 0:
+        raise ValueError("cooldown_seconds must be non-negative")
     if pipeline in _throttle_registry:
         _, existing_cooldown = _throttle_registry[pipeline]
         effective_cooldown = cooldown_seconds if cooldown_seconds is not None else existing_cooldown
