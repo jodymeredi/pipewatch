@@ -89,6 +89,17 @@ def analyze_trend(
     )
 
 
+def filter_trends(trends: List[TrendResult], direction: str) -> List[TrendResult]:
+    """Return only the trends matching the given direction.
+
+    Parameters
+    ----------
+    trends:    list of TrendResult objects to filter
+    direction: one of 'improving', 'degrading', 'stable', 'insufficient_data'
+    """
+    return [t for t in trends if t.direction == direction]
+
+
 def summarize_trends(trends: List[TrendResult]) -> dict:
     """Return a simple count summary of trend directions."""
     summary: dict = {"improving": 0, "degrading": 0, "stable": 0, "insufficient_data": 0}
