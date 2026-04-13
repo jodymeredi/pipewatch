@@ -71,3 +71,16 @@ def test_full_workflow_add_search_remove():
     assert results[0]["tags"] == ["incident"]
     _simulate_remove("pipe")
     assert _simulate_list("pipe") == []
+
+
+def test_multiple_annotations_same_pipeline():
+    """Adding multiple annotations to the same pipeline should accumulate entries."""
+    _simulate_add("shared_pipe", "Initial deploy", author="dev1")
+    _simulate_add("shared_pipe", "Config update", author="dev2")
+    _simulate_add("shared_pipe", "Hotfix applied", author="dev1")
+    entries = _simulate_list("shared_pipe")
+    assert len(entries) == 3
+    notes = [e["note"] for e in entries]
+    assert "Initial deploy" in notes
+    assert "Config update" in notes
+    assert "Hotfix applied" in notes
