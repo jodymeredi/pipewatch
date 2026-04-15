@@ -91,3 +91,19 @@ def summarize_replay(results: list[ReplayResult]) -> dict[str, Any]:
     ok = sum(1 for r in results if r.status == "ok")
     breaching = total - ok
     return {"total": total, "ok": ok, "breaching": breaching}
+
+
+def filter_results_by_status(
+    results: list[ReplayResult], status: str
+) -> list[ReplayResult]:
+    """Return only the replay results that match the given status.
+
+    Args:
+        results: Full list of ReplayResult objects from a replay run.
+        status: Status string to filter by, e.g. ``"ok"``, ``"warning"``,
+            or ``"critical"``.
+
+    Returns:
+        A new list containing only results whose status equals *status*.
+    """
+    return [r for r in results if r.status == status]
