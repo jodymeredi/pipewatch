@@ -63,6 +63,21 @@ def remove_pipeline_from_group(group: str, pipeline: str) -> bool:
         return False
 
 
+def find_groups_for_pipeline(pipeline: str) -> List[str]:
+    """Return the names of all groups that contain *pipeline*.
+
+    Useful for auditing which groups a given pipeline belongs to, or for
+    cleaning up references before renaming/deleting a pipeline.
+
+    Args:
+        pipeline: The exact pipeline name to search for.
+
+    Returns:
+        A sorted list of group names that include *pipeline*.
+    """
+    return sorted(group for group, members in _registry.items() if pipeline in members)
+
+
 def filter_metrics_by_group(group: str, metrics: List[PipelineMetric]) -> List[PipelineMetric]:
     """Return only the metrics whose pipeline name belongs to *group*."""
     members = set(_registry.get(group, []))
