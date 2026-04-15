@@ -59,3 +59,11 @@ def test_resolve_policy_returns_specific_over_default():
     p = retention.resolve_policy("pipe")
     assert p["max_days"] == 7
     assert p["max_snapshots"] == 50
+
+
+def test_resolve_policy_falls_back_to_default_for_unknown_pipe():
+    """When no specific policy is set, resolve_policy should return the default."""
+    retention.set_default_policy(max_days=14, max_snapshots=300)
+    p = retention.resolve_policy("unknown_pipe")
+    assert p["max_days"] == 14
+    assert p["max_snapshots"] == 300
