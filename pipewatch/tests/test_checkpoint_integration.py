@@ -20,6 +20,12 @@ def _make_metric(pipeline: str, value: float, status: str = "ok"):
     return collect_metric(pipeline, value, status=status)
 
 
+def _record_stages(pipeline: str, *stages: str) -> None:
+    """Helper: record multiple checkpoints for a pipeline in one call."""
+    for stage in stages:
+        cp.record_checkpoint(pipeline, stage)
+
+
 def test_checkpoint_recorded_before_metric_collection():
     """A checkpoint should be recordable independently of metric collection."""
     cp.record_checkpoint("orders", "extract")
@@ -48,8 +54,7 @@ def test_stale_detection_after_simulated_delay(monkeypatch):
 
 def test_clear_pipeline_after_successful_run():
     """After a pipeline finishes, operator clears its checkpoints."""
-    for stage in ("extract", "transform", "load"):
-        cp.record_checkpoint("etl", stage)
+    _record_stages("etl", "extract", "transform", "load")
     removed = cp.clear_pipeline("etl")
     assert removed == 3
     assert cp.list_checkpoints("etl") == []
@@ -65,3 +70,10 @@ def test_re_record_checkpoint_updates_timestamp(monkeypatch):
     cp.record_checkpoint("etl", "extract")
 
     assert cp.get_checkpoint("etl", "extract") == later
+
+
+def test_list_checkpoints_returns_all_recorded_stages():
+    """list_checkpoints should return every stage recorded for a pipeline."""
+    _record_stages("reports", "extract", "transform", "validate", "load")
+    stages = cp.list_checkpoints("reports")
+    assert sorted(stages) == ["extract", "load", "transform", "validate"]
